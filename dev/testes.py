@@ -1,4 +1,9 @@
-from crud import insert_book,insert_user, listar_livros
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from models.crud import insert_book,insert_user, listar_livros
 
 #crud do livro
 #insert_book("Python", "Anibal", "Plurar", 2020, "484as845648" )
