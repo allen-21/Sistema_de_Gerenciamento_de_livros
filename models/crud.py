@@ -43,18 +43,27 @@ def insert_user(nome, sobrenome, endereco, email, telefone):
 # Inserir emprestimos
 def insert_loan(id_livro, id_usuario, data_emprestimo, data_devolucao):
     conn = connect()
-    conn.execute("INSERT INTO emprestimo(id_livro, id_usuario, data_emprestimo, data_devolucao)\
+    conn.execute("INSERT INTO emprestimos(id_livro, id_usuario, data_emprestimo, data_devolucao)\
                   VALUES (?, ?, ?, ?)",(id_livro, id_usuario, data_emprestimo, data_devolucao))
+    conn.commit()
+    conn.close()
+
+
+#Devolucao do livro
+
+def update_loan_return_date(id_emprestimo, data_devolucao):
+    conn = connect()
+    conn.execute("UPDATE emprestimos SET data_devolucao = ? WHERE id = ?", (id_emprestimo, data_devolucao))
     conn.commit()
     conn.close()
 
 #Exibir emprestimos 
 def get_books_on_lean():
     conn = connect()
-    result = conn.execute("SELECT livros.titulo, usuarios.nome, usuarios.sobrenome, emprestimo.data_emprestimo, emprestimo.data_devolucao\
+    result = conn.execute("SELECT livros.titulo, usuarios.nome, usuarios.sobrenome, emprestimos.data_emprestimo, emprestimos.data_devolucao\
                            FROM livros\
-                          INNER JOIN emprestimos ON livros.id = emprstimos.id_livro\
+                          INNER JOIN emprestimos ON livros.id = emprestimos.id_livro\
                           INNER JOIN usuarios ON usuarios.id = emprestimos.id_usuario\
-                          WHERE emprstimos.data_devolucao IS NULL").fetchall()
+                          WHERE emprestimos.data_devolucao IS NULL").fetchall()
     conn.close()
     return result
