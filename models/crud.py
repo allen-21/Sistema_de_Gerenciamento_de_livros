@@ -18,19 +18,7 @@ def listar_livros():
     conn = connect()
     livros = conn.execute("SELECT * FROM livros").fetchall()
     conn.close()
-
-    if not livros:
-        print("Nemhum livro encontrado na biblioteca")
-        return
-    print("Livros na biblioteca: ")
-    for livro in livros:
-        print(f"ID: {livro[0]}")
-        print(f"Titulo: {livro[1]}")
-        print(f"Autor: {livro[2]}")
-        print(f"Editora: {livro[3]}")
-        print(f"Ano da Publicacao: {livro[4]}")
-        print(f"Isbn: {livro[5]}")
-        print("\n")
+    return livros
 
 # Inserir usuarios 
 def insert_user(nome, sobrenome, endereco, email, telefone):
@@ -40,6 +28,14 @@ def insert_user(nome, sobrenome, endereco, email, telefone):
     conn.commit()
     conn.close()
 
+# Exibir usuarios 
+def get_users():
+    conn = connect()
+    usuarios = conn.execute("SELECT* FROM usuarios").fetchall()
+    conn.close()
+    return usuarios
+
+    
 # Inserir emprestimos
 def insert_loan(id_livro, id_usuario, data_emprestimo, data_devolucao):
     conn = connect()
@@ -53,17 +49,26 @@ def insert_loan(id_livro, id_usuario, data_emprestimo, data_devolucao):
 
 def update_loan_return_date(id_emprestimo, data_devolucao):
     conn = connect()
-    conn.execute("UPDATE emprestimos SET data_devolucao = ? WHERE id = ?", (id_emprestimo, data_devolucao))
+    conn.execute(
+        "UPDATE emprestimos SET data_devolucao = ? WHERE id = ?", 
+        (data_devolucao, id_emprestimo)
+    )
     conn.commit()
     conn.close()
 
 #Exibir emprestimos 
 def get_books_on_lean():
     conn = connect()
-    result = conn.execute("SELECT livros.titulo, usuarios.nome, usuarios.sobrenome, emprestimos.data_emprestimo, emprestimos.data_devolucao\
-                           FROM livros\
-                          INNER JOIN emprestimos ON livros.id = emprestimos.id_livro\
-                          INNER JOIN usuarios ON usuarios.id = emprestimos.id_usuario\
-                          WHERE emprestimos.data_devolucao IS NULL").fetchall()
+    result = conn.execute(
+        "SELECT emprestimos.id, livros.titulo, \
+                usuarios.nome || ' ' || usuarios.sobrenome AS nome_completo, \
+                emprestimos.data_emprestimo, emprestimos.data_devolucao \
+         FROM livros \
+         INNER JOIN emprestimos ON livros.id = emprestimos.id_livro \
+         INNER JOIN usuarios ON usuarios.id = emprestimos.id_usuario \
+         WHERE emprestimos.data_devolucao IS NULL"
+    ).fetchall()
     conn.close()
     return result
+
+
